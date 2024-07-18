@@ -6,15 +6,19 @@
 # Copyright (C) 2023 Beacon <beacon3d.com>
 # This file may be distributed under the terms of the GNU GPLv3 license.
 
-KDIR="/usr/share/klipper"
-KENV="/usr/share/klippy-env"
 PYTHON_EXEC="$KENV/bin/python"
 
 BKDIR=/usr/data/cartographer-klipper
 
-if [ ! -d "$KDIR" ] || [ ! -d "$KENV" ]; then
-    echo "Cartographer: klipper or klippy env doesn't exist"
-    exit 1
+if [ -d "/usr/share/klipper" ] && [ -d "/usr/share/klippy-env" ]; then
+  KDIR="/usr/share/klipper"
+  KENV="/usr/share/klippy-env"
+elif [ -d "/usr/data/klipper" ] && [ -d "/usr/data/klippy-venv" ]; then
+  KDIR="/usr/data/klipper"
+  KENV="/usr/data/klippy-venv"
+else
+  echo "Cartographer: klipper or klippy env doesn't exist"
+  exit 1
 fi
 
 # update link to cartographer.py & idm.py
