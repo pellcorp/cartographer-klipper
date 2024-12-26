@@ -944,7 +944,12 @@ class Scanner:
             ]
 
             # Check if there are any results at all
-            if not results or all(not r["success"] for r in results):
+            if not results:
+                # If no thresholds passed the scan at all
+                gcmd.respond_info("No results were found during the scan.")
+                return  # Exit as there's no best threshold to save
+
+            if all(not r["success"] for r in results):
                 # If no thresholds passed the scan at all
                 gcmd.respond_info("No suitable threshold was found during the scan.")
                 return  # Exit as there's no best threshold to save
