@@ -1234,6 +1234,8 @@ class Scanner:
                 self.toolhead.wait_moves()
                 if hasattr(kin, "note_z_not_homed"):
                     kin.note_z_not_homed()
+                if hasattr(kin, "clear_homing_state"):
+                    kin.clear_homing_state((2,))
             elif pos[2] < self.z_hop_dist:
                 self.toolhead.manual_move(move, self.z_hop_speed)
                 self.toolhead.wait_moves()
