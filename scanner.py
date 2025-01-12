@@ -492,7 +492,7 @@ class Scanner:
                 self._start_calibration(gcmd)
             return
 
-        self.check_temp(gcmd)
+        #self.check_temp(gcmd)
         self.log_debug_info(
             vars["verbose"], gcmd, f"Trigger Method: {self.trigger_method}"
         )
