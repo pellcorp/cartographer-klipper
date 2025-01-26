@@ -1228,6 +1228,9 @@ class Scanner:
 
             move = [None, None, self.z_hop_dist]
             if "z" not in kin_status["homed_axes"]:
+                gcmd.respond_info(
+                    "Z not in homed axes for zhop"
+                )
                 pos[2] = 0
                 self.toolhead.set_position(pos, homing_axes=[2])
                 self.toolhead.manual_move(move, self.z_hop_speed)
