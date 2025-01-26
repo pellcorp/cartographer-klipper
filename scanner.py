@@ -736,6 +736,9 @@ class Scanner:
         except self.printer.command_error:
             self.trigger_method = TriggerMethod.SCAN
             if hasattr(kinematics, "note_z_not_homed"):
+                gcmd.respond_info(
+                    "Note not homed here"
+                )
                 kinematics.note_z_not_homed()
             raise
 
