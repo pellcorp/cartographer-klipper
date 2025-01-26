@@ -506,7 +506,7 @@ class Scanner:
             raise gcmd.error("Must home X and Y axes first")
 
         self.previous_probe_success = 0
-        self._zhop()
+        self._zhop(gcmd)
         self._move(
             [vars["touch_location_x"], vars["touch_location_y"], None],
             vars["move_speed"],
@@ -587,7 +587,7 @@ class Scanner:
             else:
                 self.trigger_method = TriggerMethod.SCAN
                 gcmd.respond_info("Touch procedure failed.")
-            self._zhop()
+            self._zhop(gcmd)
             self.set_temp(gcmd)
             self.extruder_target = 0
 
@@ -676,7 +676,7 @@ class Scanner:
                 if deviation > tolerance:
                     if retries >= max_retries:
                         self.trigger_method = TriggerMethod.SCAN
-                        self._zhop()
+                        self._zhop(gcmd)
                         raise gcmd.error(
                             f"Exceeded maximum attempts [{retries}/{int(max_retries)}]"
                         )
@@ -826,7 +826,7 @@ class Scanner:
                 lines.append(f"Please run {format_macro(cmd)}")
             raise gcmd.error(" ".join(lines))
 
-        self._zhop()
+        self._zhop(gcmd)
         self._move(
             [vars["touch_location_x"], vars["touch_location_y"], None],
             vars["move_speed"],
@@ -932,7 +932,7 @@ class Scanner:
                 current_threshold += step
 
         finally:
-            self._zhop()
+            self._zhop(gcmd)
 
             # In the finally block, filter for consistent results only
             consistent_results = [
@@ -1219,7 +1219,7 @@ class Scanner:
     def set_accel(self, value: float):
         self.gcode.run_script_from_command("SET_VELOCITY_LIMIT ACCEL=%.3f" % (value,))
 
-    def _zhop(self):
+    def _zhop(self, gcmd: GCodeCommand):
         if self.z_hop_dist != 0:
             curtime = self.printer.get_reactor().monotonic()
             kin = self.toolhead.get_kinematics()
@@ -1238,8 +1238,15 @@ class Scanner:
                 if hasattr(kin, "note_z_not_homed"):
                     kin.note_z_not_homed()
             elif pos[2] < self.z_hop_dist:
+                gcmd.respond_info(
+                    "pos[2] < self.z_hop_dist"
+                )
                 self.toolhead.manual_move(move, self.z_hop_speed)
                 self.toolhead.wait_moves()
+            else:
+                gcmd.respond_info(
+                    "else homed and z_hop_dist > pos[2]"
+                )
 
     def _move(self, coord: "list[float | None]", speed: float):
         self.printer.lookup_object("toolhead").manual_move(coord, speed)
@@ -1577,7 +1584,7 @@ class Scanner:
     ):
         if kin_pos is None:
             self.trigger_method = TriggerMethod.SCAN
-            self._zhop()
+            self._zhop(gcmd)
             if forced_z:
                 kin = self.toolhead.get_kinematics()
                 if hasattr(kin, "note_z_not_homed"):
@@ -1637,7 +1644,7 @@ class Scanner:
         except Exception as e:
             print(f"Error encounted while calibrating: {e}")
             self.trigger_method = TriggerMethod.SCAN
-            self._zhop()
+            self._zhop(gcmd)
         finally:
             self._stop_streaming()
 
@@ -1682,7 +1689,7 @@ class Scanner:
             % (pos[0], pos[1], cal_min_z, cal_max_z, cal_speed, temp_median)
         )
         self.trigger_method = TriggerMethod.SCAN
-        self._zhop()
+        self._zhop(gcmd)
 
     # Internal
 
